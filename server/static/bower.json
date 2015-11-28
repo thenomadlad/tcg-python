@@ -1,0 +1,29 @@
+{
+  "name": "tcg-python",
+  "homepage": "https://github.com/adityadhara/tcg-python",
+  "authors": [
+    "Aditya Dhara <aditya1992@gmail.com>"
+  ],
+  "description": "Test case generator - Ehh my first project so I have no expectations",
+  "main": "framework.js",
+  "moduleType": [],
+  "keywords": [
+    "Testing",
+    "state-machine",
+    "state"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "backbone": "~1.2.3",
+    "underscore": "~1.8.3",
+    "bootstrap": "~3.3.6"
+  }
+}
