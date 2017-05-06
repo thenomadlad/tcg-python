@@ -1,0 +1,11 @@
+{
+  "name": "tcg-front",
+  "version": "1.0.0",
+  "description": "A front-end for the tcg-python test case generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aditya Dhara",
+  "license": "ISC"
+}
