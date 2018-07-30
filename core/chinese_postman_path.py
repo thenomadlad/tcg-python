@@ -1,4 +1,4 @@
-import shortest_paths, duplications_finder
+from . import shortest_paths, duplications_finder
 
 class ChinesePostmanPath:
     """
@@ -70,10 +70,10 @@ class ChinesePostmanPath:
         self.dup_finder = duplications_finder.DuplicationsFinder(self.g, self.s_paths)
         self.to_duplicate = self.dup_finder.matching
 
-        for src, dests in self.to_duplicate.iteritems():
+        for src, dests in list(self.to_duplicate.items()):
             for dest in dests:
                 path = self.s_paths.get_shortest_path(src, dest)
-                for i in xrange(len(path)-1):
+                for i in range(len(path)-1):
                     self.g.add_edge(path[i], path[i+1], key=self.g.size())
 
     def find_tour(self):

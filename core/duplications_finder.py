@@ -1,4 +1,4 @@
-import shortest_paths
+from . import shortest_paths
 import networkx as nx
 
 class DuplicationsFinder:
@@ -136,7 +136,7 @@ class DuplicationsFinder:
         self.right_set = []
         for node in self.degree_surplus:
             count = self.degree_surplus[node]
-            for i in xrange(abs(count)):
+            for i in range(abs(count)):
                 item = (node, i)
                 if count < 0:
                     self.left_set.append(item)
