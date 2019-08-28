@@ -32,7 +32,7 @@ class ShortestPaths:
 
         >>> import networkx as nx
         >>> g = nx.MultiDiGraph()
-        >>> g.add_edge('a', 'b')
+        >>> _ = g.add_edge('a', 'b')
         >>> sp = ShortestPaths(g)
         >>> sp.recreate(None)
         Traceback (most recent call last):
@@ -44,7 +44,7 @@ class ShortestPaths:
             ...
         Exception: MultiDiGraph is empty
         >>> graph = nx.Graph()
-        >>> graph.add_edge('a', 'b')
+        >>> _ = graph.add_edge('a', 'b')
         >>> sp.recreate(graph)
         Traceback (most recent call last):
             ...
@@ -74,18 +74,18 @@ class ShortestPaths:
         >>> import networkx as nx
         >>> g = nx.MultiDiGraph()
         >>> nodes_order = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-        >>> g.add_edge('a', 'b')
-        >>> g.add_edge('b', 'c')
-        >>> g.add_edge('b', 'c')
-        >>> g.add_edge('c', 'd')
-        >>> g.add_edge('c', 'e')
-        >>> g.add_edge('e', 'f')
-        >>> g.add_edge('d', 'g')
-        >>> g.add_edge('e', 'g')
-        >>> g.add_edge('g', 'c')
-        >>> g.add_edge('f', 'h')
-        >>> g.add_edge('g', 'h')
-        >>> g.add_edge('h', 'a')
+        >>> _ = g.add_edge('a', 'b')
+        >>> _ = g.add_edge('b', 'c')
+        >>> _ = g.add_edge('b', 'c')
+        >>> _ = g.add_edge('c', 'd')
+        >>> _ = g.add_edge('c', 'e')
+        >>> _ = g.add_edge('e', 'f')
+        >>> _ = g.add_edge('d', 'g')
+        >>> _ = g.add_edge('e', 'g')
+        >>> _ = g.add_edge('g', 'c')
+        >>> _ = g.add_edge('f', 'h')
+        >>> _ = g.add_edge('g', 'h')
+        >>> _ = g.add_edge('h', 'a')
         >>> sp = ShortestPaths(g)
         >>> sp.dump_tables(nodes_order)   # doctest: +NORMALIZE_WHITESPACE
         {'a': {'b': 'a', 'c': 'b', 'd': 'c', 'e': 'c', 'f': 'e', 'g': 'e', 'h': 'g'},
@@ -112,28 +112,28 @@ class ShortestPaths:
         if self.g is None:
             raise Exception("parse can't be called before setting a graph. Call recreate(g)"
                             " with a multi-digraph")
-        
+
         # initialize maps
         self.distances = {}
         self.paths = {}
-        for node in self.g.nodes_iter():
+        for node in self.g.nodes():
             self.paths[node] = {}
             self.distances[node] = {}
 
         # get first pass
-        for node in self.g.nodes_iter():
-            for child in self.g.successors_iter(node):
+        for node in self.g.nodes():
+            for child in self.g.successors(node):
                 if child == node:
                     continue
                 self.paths[node][child] = node
                 self.distances[node][child] = 1 # TODO: replace following with weight
-        
+
         # iterate over nodes
-        for mid in self.g.nodes_iter():
-            for src in self.g.nodes_iter():
+        for mid in self.g.nodes():
+            for src in self.g.nodes():
                 if mid not in self.distances[src]:
                     continue
-                for end in self.g.nodes_iter():
+                for end in self.g.nodes():
                     if src == end:
                         continue
                     if end not in self.distances[mid]:
@@ -153,31 +153,31 @@ class ShortestPaths:
 
         >>> import networkx as nx
         >>> mdg = nx.MultiDiGraph()
-        >>> mdg.add_edge('start', 'a')
-        >>> mdg.add_edge('a', 'b')
-        >>> mdg.add_edge('b', 'c')
-        >>> mdg.add_edge('c', 'd')
-        >>> mdg.add_edge('c', 'e')
-        >>> mdg.add_edge('c', 'f')
-        >>> mdg.add_edge('c', 'g')
-        >>> mdg.add_edge('d', 'h')
-        >>> mdg.add_edge('f', 'h')
-        >>> mdg.add_edge('g', 'h')
-        >>> mdg.add_edge('h', 'e')
-        >>> mdg.add_edge('e', 'end')
-        >>> mdg.add_edge('end', 'start')
+        >>> _ = mdg.add_edge('start', 'a')
+        >>> _ = mdg.add_edge('a', 'b')
+        >>> _ = mdg.add_edge('b', 'c')
+        >>> _ = mdg.add_edge('c', 'd')
+        >>> _ = mdg.add_edge('c', 'e')
+        >>> _ = mdg.add_edge('c', 'f')
+        >>> _ = mdg.add_edge('c', 'g')
+        >>> _ = mdg.add_edge('d', 'h')
+        >>> _ = mdg.add_edge('f', 'h')
+        >>> _ = mdg.add_edge('g', 'h')
+        >>> _ = mdg.add_edge('h', 'e')
+        >>> _ = mdg.add_edge('e', 'end')
+        >>> _ = mdg.add_edge('end', 'start')
         >>> sp = ShortestPaths(mdg)
-        >>> print sp.get_shortest_path_length('a', 'd')
+        >>> print(sp.get_shortest_path_length('a', 'd'))
         3
-        >>> print sp.get_shortest_path_length('c', 'a')
+        >>> print(sp.get_shortest_path_length('c', 'a'))
         4
-        >>> print sp.get_shortest_path_length('g', 'd')
+        >>> print(sp.get_shortest_path_length('g', 'd'))
         8
-        >>> print sp.get_shortest_path_length('blah', 'd')
+        >>> print(sp.get_shortest_path_length('blah', 'd'))
         Traceback (most recent call last):
             ...
         Exception: start node not contained in graph
-        >>> print sp.get_shortest_path_length('d', 'blah')
+        >>> print(sp.get_shortest_path_length('d', 'blah'))
         Traceback (most recent call last):
             ...
         Exception: end node not contained in graph
@@ -208,31 +208,31 @@ class ShortestPaths:
 
         >>> import networkx as nx
         >>> mdg = nx.MultiDiGraph()
-        >>> mdg.add_edge('start', 'a')
-        >>> mdg.add_edge('a', 'b')
-        >>> mdg.add_edge('b', 'c')
-        >>> mdg.add_edge('c', 'd')
-        >>> mdg.add_edge('c', 'e')
-        >>> mdg.add_edge('c', 'f')
-        >>> mdg.add_edge('c', 'g')
-        >>> mdg.add_edge('d', 'h')
-        >>> mdg.add_edge('f', 'h')
-        >>> mdg.add_edge('g', 'h')
-        >>> mdg.add_edge('h', 'e')
-        >>> mdg.add_edge('e', 'end')
-        >>> mdg.add_edge('end', 'start')
+        >>> _ = mdg.add_edge('start', 'a')
+        >>> _ = mdg.add_edge('a', 'b')
+        >>> _ = mdg.add_edge('b', 'c')
+        >>> _ = mdg.add_edge('c', 'd')
+        >>> _ = mdg.add_edge('c', 'e')
+        >>> _ = mdg.add_edge('c', 'f')
+        >>> _ = mdg.add_edge('c', 'g')
+        >>> _ = mdg.add_edge('d', 'h')
+        >>> _ = mdg.add_edge('f', 'h')
+        >>> _ = mdg.add_edge('g', 'h')
+        >>> _ = mdg.add_edge('h', 'e')
+        >>> _ = mdg.add_edge('e', 'end')
+        >>> _ = mdg.add_edge('end', 'start')
         >>> sp = ShortestPaths(mdg)
-        >>> print sp.get_shortest_path('a', 'd') # doctest: +NORMALIZE_WHITESPACE
+        >>> print(sp.get_shortest_path('a', 'd'))  # doctest: +NORMALIZE_WHITESPACE
         ['a', 'b', 'c', 'd']
-        >>> print sp.get_shortest_path('c', 'a') # doctest: +NORMALIZE_WHITESPACE
+        >>> print(sp.get_shortest_path('c', 'a'))  # doctest: +NORMALIZE_WHITESPACE
         ['c', 'e', 'end', 'start', 'a']
-        >>> print sp.get_shortest_path('g', 'd')
+        >>> print(sp.get_shortest_path('g', 'd') )
         ['g', 'h', 'e', 'end', 'start', 'a', 'b', 'c', 'd']
-        >>> print sp.get_shortest_path('blah', 'd')
+        >>> print(sp.get_shortest_path('blah', 'd'))
         Traceback (most recent call last):
             ...
         Exception: start node not contained in graph
-        >>> print sp.get_shortest_path('d', 'blah')
+        >>> print(sp.get_shortest_path('d', 'blah'))
         Traceback (most recent call last):
             ...
         Exception: end node not contained in graph
@@ -262,7 +262,7 @@ class ShortestPaths:
         # these two lines shouldn't be touched
         if ret[-1] != start:
             return None
-        
+
         ret.reverse()
 
         return ret

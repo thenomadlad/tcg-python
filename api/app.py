@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import json
-
 import networkx as nx
 from flask import Flask, jsonify, request
 
@@ -28,14 +26,18 @@ def parse():
             for idx, edge in enumerate(data['edges']):
                 mdg.add_edge(edge['from_node'], edge['to_node'], key=idx)
 
+            if 'start' not in mdg.nodes() or 'end' not in mdg.nodes():
+                raise Exception("The provided graph needs to have 'start' and 'end' nodes")
+
             # also add end->start as an edge because we can always start over
-            mdg.add_edge(data['end'], data['start'])
+            if not mdg.has_edge('end', 'start'):
+                mdg.add_edge('end', 'start', key=mdg.size())
 
             # get the shortest tour and break it up by end->start edges
-            sp = ChinesePostmanPath(mdg, data['start'], data['end'])
+            sp = ChinesePostmanPath(mdg, 'start', 'end')
             paths = [[]]
             for item in sp.shortest_tour:
-                if item[0] == data['end'] and item[1] == data['start']:
+                if item[0] == 'end' and item[1] == 'start':
                     paths.append([])
                 else:
                     paths[-1].append([item[0], item[1]])

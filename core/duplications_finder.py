@@ -53,7 +53,7 @@ class DuplicationsFinder:
 
         >>> import networkx as nx
         >>> g = nx.MultiDiGraph()
-        >>> g.add_edge('a', 'b')
+        >>> _ = g.add_edge('a', 'b')
         >>> df = DuplicationsFinder(g)
         >>> df.recreate(None)
         Traceback (most recent call last):
@@ -65,7 +65,7 @@ class DuplicationsFinder:
             ...
         Exception: MultiDiGraph is empty
         >>> graph = nx.Graph()
-        >>> graph.add_edge('a', 'b')
+        >>> _ = graph.add_edge('a', 'b')
         >>> df.recreate(graph)
         Traceback (most recent call last):
             ...
@@ -93,29 +93,29 @@ class DuplicationsFinder:
         and finally calls networkx's maximum_weight_matching algorithm.
 
         >>> mdg = nx.MultiDiGraph()
-        >>> mdg.add_edge('start', 'a')
-        >>> mdg.add_edge('a', 'b')
-        >>> mdg.add_edge('b', 'c')
-        >>> mdg.add_edge('b', 'c')
-        >>> mdg.add_edge('c', 'd')
-        >>> mdg.add_edge('c', 'e')
-        >>> mdg.add_edge('c', 'f')
-        >>> mdg.add_edge('c', 'g')
-        >>> mdg.add_edge('d', 'h')
-        >>> mdg.add_edge('f', 'h')
-        >>> mdg.add_edge('g', 'h')
-        >>> mdg.add_edge('h', 'e')
-        >>> mdg.add_edge('e', 'end')
-        >>> mdg.add_edge('end', 'start')
+        >>> _ = mdg.add_edge('start', 'a')
+        >>> _ = mdg.add_edge('a', 'b')
+        >>> _ = mdg.add_edge('b', 'c')
+        >>> _ = mdg.add_edge('b', 'c')
+        >>> _ = mdg.add_edge('c', 'd')
+        >>> _ = mdg.add_edge('c', 'e')
+        >>> _ = mdg.add_edge('c', 'f')
+        >>> _ = mdg.add_edge('c', 'g')
+        >>> _ = mdg.add_edge('d', 'h')
+        >>> _ = mdg.add_edge('f', 'h')
+        >>> _ = mdg.add_edge('g', 'h')
+        >>> _ = mdg.add_edge('h', 'e')
+        >>> _ = mdg.add_edge('e', 'end')
+        >>> _ = mdg.add_edge('end', 'start')
         >>> df = DuplicationsFinder(mdg)
-        >>> print df.degree_surplus # doctest: +NORMALIZE_WHITESPACE
-        {'a': 0, 'c': 2, 'b': 1, 'e': -1, 'd': 0, 'g': 0, 'f': 0, 'h': -2, 'start': 0, 'end': 0}
-        >>> print df.left_set   # doctest: +NORMALIZE_WHITESPACE
+        >>> print(sorted(df.degree_surplus.items()))  # doctest: +NORMALIZE_WHITESPACE
+        [('a', 0), ('b', 1), ('c', 2), ('d', 0), ('e', -1), ('end', 0), ('f', 0), ('g', 0), ('h', -2), ('start', 0)]
+        >>> print(sorted(df.left_set))  # doctest: +NORMALIZE_WHITESPACE
         [('e', 0), ('h', 0), ('h', 1)]
-        >>> print df.right_set  # doctest: +NORMALIZE_WHITESPACE
-        [('c', 0), ('c', 1), ('b', 0)]
-        >>> print df.matching   # doctest: +NORMALIZE_WHITESPACE
-        {'h': ['b', 'c'], 'e': ['c']}
+        >>> print(sorted(df.right_set))  # doctest: +NORMALIZE_WHITESPACE
+        [('b', 0), ('c', 0), ('c', 1)]
+        >>> print(df.matching)  # doctest: +NORMALIZE_WHITESPACE
+-       {'h': ['b', 'c'], 'e': ['c']}
 
         :return: Nothing
         """
@@ -126,7 +126,7 @@ class DuplicationsFinder:
                             "Non-empty digraph")
 
         # Step 1 - determine degree_surplus
-        for node in self.g.nodes_iter():
+        for node in self.g.nodes():
             in_degree = self.g.in_degree(node)
             out_degree = self.g.out_degree(node)
             self.degree_surplus[node] = out_degree-in_degree
@@ -143,23 +143,24 @@ class DuplicationsFinder:
                 elif count > 0:
                     self.right_set.append(item)
 
-        # Step 3 - make bipartite graph
-        if self.shortest_paths is None:
-            sp = shortest_paths.ShortestPaths(self.g)
-        else:
-            sp = self.shortest_paths
-        bpgraph = nx.Graph()
-        bpgraph.add_nodes_from(self.left_set, bipartite=0)
-        bpgraph.add_nodes_from(self.right_set, bipartite=1)
-        for lnode in self.left_set:
-            for rnode in self.right_set:
-                wt = sp.get_shortest_path_length(lnode[0], rnode[0])
-                bpgraph.add_edge(lnode, rnode, weight=wt)
+        if self.left_set and self.right_set:
+            # Step 3 - make bipartite graph
+            if self.shortest_paths is None:
+                sp = shortest_paths.ShortestPaths(self.g)
+            else:
+                sp = self.shortest_paths
+            bpgraph = nx.Graph()
+            bpgraph.add_nodes_from(self.left_set, bipartite=0)
+            bpgraph.add_nodes_from(self.right_set, bipartite=1)
+            for lnode in self.left_set:
+                for rnode in self.right_set:
+                    wt = sp.get_shortest_path_length(lnode[0], rnode[0])
+                    bpgraph.add_edge(lnode, rnode, weight=wt)
 
-        # Step 4 - find matching
-        matches = nx.bipartite.eppstein_matching(bpgraph)
-        for source in self.left_set:
-            dest = matches[source]
-            if source[0] not in self.matching:
-                self.matching[source[0]] = []
-            self.matching[source[0]].append(dest[0])
+            # Step 4 - find matching
+            matches = nx.bipartite.eppstein_matching(bpgraph)
+            for source in self.left_set:
+                dest = matches[source]
+                if source[0] not in self.matching:
+                    self.matching[source[0]] = []
+                self.matching[source[0]].append(dest[0])

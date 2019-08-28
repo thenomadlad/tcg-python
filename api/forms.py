@@ -12,7 +12,5 @@ class EdgeForm(Form):
 
 
 class ParseForm(FlaskForm):
-    start = StringField('start', [validators.required()])
-    end = StringField('end', [validators.required()])
     edges = FieldList(FormField(EdgeForm), 'edges', [validators.required()])
     verbose = BooleanField('verbose', default=False)
